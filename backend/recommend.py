@@ -16,10 +16,10 @@ mood for. Recommend ONE game as the top pick, plus two runner-ups.
 
 Respond with ONLY valid JSON in this exact format, no other text:
 {
-  "recommendation": {"appid": 12345, "name": "Game Name", "reasoning": "1-2 sentence explanation of why this game fulfills the user's mood"},
+  "recommendation": {"appid": 12345, "name": "Game Name", "reasoning": "1-2 sentence explanation of why this game fulfills the user's mood, and a brief description of the game emphasizing aspects relevant to the mood."},
   "runner_ups": [
-    {"appid": 12345, "name": "Game Name", "reasoning": "..."},
-    {"appid": 12345, "name": "Game Name", "reasoning": "..."}
+    {"appid": 12345, "name": "Game Name", "reasoning": "1-2 sentence explanation of why this game fulfills the user's mood, emphasizing aspects of the game that differ from the main recommendation without directly bringing up the main recommendation."},
+    {"appid": 12345, "name": "Game Name", "reasoning": "Same as previous reasoning, but how it differs from both previous recommendations."}
   ]
 }"""
 

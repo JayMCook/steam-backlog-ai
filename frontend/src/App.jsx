@@ -3,6 +3,8 @@ import steamLogo from './assets/steamlogo.png'
 
 import './App.css'
 
+const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
 function App() {
   const [count, setCount] = useState(0)
   const [steamId, setSteamId] = useState("");
@@ -18,7 +20,7 @@ function App() {
     setResult(null);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/recommend", {
+      const response = await fetch(`${API_URL}/recommend`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ steam_id: steamId, mood: mood }),
@@ -63,6 +65,7 @@ function App() {
         <button type="submit" disabled={loading}>
           {loading ? "Thinking..." : "Show Me What to Play!"}
         </button>
+        <p hidden={!loading} className="loading-indicator">Fetching your backlog and game details — this can take up to a minute the first time, since we're pulling fresh data from Steam for each game.</p>
       </form>
 
       {error && <p className="error">{error}</p>}

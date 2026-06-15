@@ -1,5 +1,7 @@
 #FastAPI app exposing backlog and recommendation endpoints.
 
+import requests
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
@@ -8,6 +10,9 @@ from enrich import enrich_backlog
 from recommend import get_recommendation
 
 from fastapi.middleware.cors import CORSMiddleware
+
+import json
+import anthropic
 
 app = FastAPI()
 
@@ -28,7 +33,9 @@ def get_backlog(steam_id: str):
         resolved_id = resolve_steam_id(STEAM_API_KEY, steam_id)
         games = fetch_owned_games(STEAM_API_KEY, resolved_id)
     except ValueError as e:
-        raise HTTPException(status_code=404, detail="Could not fetch Steam data. Check the username/ID and try again.")
+        raise HTTPException(status_code=404, detail=str(e))
+    except (requests.HTTPError, requests.RequestException) as e:
+        raise HTTPException(status_code=404, detail=f"Steam API error: {str(e)}")
 
     backlog = filter_backlog(games)
     enriched = enrich_backlog(backlog)
@@ -46,12 +53,18 @@ def recommend(req: RecommendRequest):
         resolved_id = resolve_steam_id(STEAM_API_KEY, req.steam_id)
         games = fetch_owned_games(STEAM_API_KEY, resolved_id)
     except ValueError as e:
-        raise HTTPException(status_code=404, detail="Could not fetch Steam data. Check the username/ID and try again.")
+        raise HTTPException(status_code=404, detail=str(e))
+    except (requests.HTTPError, requests.RequestException) as e:
+        raise HTTPException(status_code=404, detail=f"Steam API error: {str(e)}")
 
     backlog = filter_backlog(games)
     enriched = enrich_backlog(backlog)
 
     if not enriched:
         raise HTTPException(status_code=404, detail="No backlog games found for this user.")
-
-    return get_recommendation(req.mood, enriched)
+    try:
+        return get_recommendation(req.mood, enriched)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=502, detail="The AI service returned an unexpected response. Please try again.")
+    except anthropic.APIError as e:
+        raise HTTPException(status_code=502, detail="The AI service is currently unavailable. Please try again later.")

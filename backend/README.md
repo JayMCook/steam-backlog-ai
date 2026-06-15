@@ -1,1 +1,0 @@
-Small application designed to recommend a game to paly from a user's Steam games backlog based off of user input that is process with an LLM API to return the best recommendation from the backlog. Currently fetches backlog data and caches the metadata of each game in a gitignored cache file.

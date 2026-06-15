@@ -48,7 +48,7 @@ def fetch_game_details(appid: int) -> dict | None:
             "description": details.get("short_description", ""),
             "appid": appid
         }
-    except (requests.RequestException, ValueError) as e:
+    except Exception as e:
         print(f"  ⚠ Error fetching appid {appid}: {e}")
         return None
 
