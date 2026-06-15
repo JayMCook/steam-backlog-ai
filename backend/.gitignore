@@ -1,0 +1,8 @@
+#env
+.env
+
+#cache
+/cache
+
+#DS_Store
+.DS_Store

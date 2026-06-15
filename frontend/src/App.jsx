@@ -1,0 +1,101 @@
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from './assets/vite.svg'
+import heroImg from './assets/hero.png'
+import './App.css'
+
+function App() {
+  const [count, setCount] = useState(0)
+  const [steamId, setSteamId] = useState("");
+  const [mood, setMood] = useState("");
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ steam_id: steamId, mood: mood }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.detail || "Something went wrong");
+      }
+
+      const data = await response.json();
+      setResult(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="app">
+      <h1>Steam Backlog Recommender</h1>
+
+      <form onSubmit={handleSubmit}>
+        <input
+          value={steamId}
+          onChange={(e) => setSteamId(e.target.value)}
+          placeholder="Your SteamID64"
+        />
+        <textarea
+          value={mood}
+          onChange={(e) => setMood(e.target.value)}
+          onInput={(e) => {
+            e.target.style.height = "auto";
+            e.target.style.height = e.target.scrollHeight + "px";
+          }}
+          placeholder="What are you in the mood for?"
+          rows={1}
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? "Thinking..." : "Show Me What to Play!"}
+        </button>
+      </form>
+
+      {error && <p className="error">{error}</p>}
+
+      {result && (
+        <div className="result">
+          <div className="recommendation-card">
+            <img
+              src={`https://cdn.akamai.steamstatic.com/steam/apps/${result.recommendation.appid}/header.jpg`}
+              alt={result.recommendation.name}
+            />
+            <div className="recommendation-text">
+              <h2>{result.recommendation.name}</h2>
+              <p>{result.recommendation.reasoning}</p>
+            </div>
+          </div>
+          <div className="runner-ups">
+            {result.runner_ups.map((game) => (
+              <div className="recommendation-card" key={game.appid}>
+                <img
+                  src={`https://cdn.akamai.steamstatic.com/steam/apps/${game.appid}/header.jpg`}
+                  alt={game.name}
+                />
+                <div className="recommendation-text">
+                  <h2>{game.name}</h2>
+                  <p>{game.reasoning}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App
