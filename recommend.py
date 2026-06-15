@@ -16,10 +16,10 @@ mood for. Recommend ONE game as the top pick, plus two runner-ups.
 
 Respond with ONLY valid JSON in this exact format, no other text:
 {
-  "recommendation": {"name": "Game Name", "reasoning": "1-2 sentence explanation of why this game fulfills the user's mood"},
+  "recommendation": {"appid": 12345, "name": "Game Name", "reasoning": "1-2 sentence explanation of why this game fulfills the user's mood"},
   "runner_ups": [
-    {"name": "Game Name", "reasoning": "..."},
-    {"name": "Game Name", "reasoning": "..."}
+    {"appid": 12345, "name": "Game Name", "reasoning": "..."},
+    {"appid": 12345, "name": "Game Name", "reasoning": "..."}
   ]
 }"""
 
@@ -34,6 +34,7 @@ def build_game_summary(backlog: list[dict]) -> list[dict]:
     return [
         {
             "name": g["name"],
+            "appid": g["appid"],
             "genres": g.get("genres", []),
             "description": g.get("description", ""),
         }
