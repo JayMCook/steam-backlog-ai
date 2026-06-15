@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import steamLogo from './assets/steamlogo.png'
+
 import './App.css'
 
 function App() {
@@ -43,11 +42,13 @@ function App() {
     <div className="app">
       <h1>Steam Backlog Recommender</h1>
 
+      <p>Before using this app, make sure your Steam profile's 'Game details' privacy setting is Public. If your steam account lacks a custom URL, use your SteamID64 instead, which is the number at the end of your Steam profile URL.</p>
+
       <form onSubmit={handleSubmit}>
         <input
           value={steamId}
           onChange={(e) => setSteamId(e.target.value)}
-          placeholder="Your SteamID64"
+          placeholder="Enter Steam Account Name or ID"
         />
         <textarea
           value={mood}

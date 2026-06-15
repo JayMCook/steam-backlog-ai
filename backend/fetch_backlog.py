@@ -14,6 +14,27 @@ BACKLOG_THRESHOLD_MINUTES = 120  # under 2 hours played = backlog
 
 API_URL = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/"
 
+RESOLVE_VANITY_URL = "https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/"
+
+
+def resolve_steam_id(api_key: str, identifier: str) -> str:
+    """Accepts either a SteamID64 or a vanity username and returns SteamID64."""
+    # SteamID64s are 17-digit numeric strings
+    if identifier.isdigit() and len(identifier) == 17:
+        return identifier
+
+    params = {"key": api_key, "vanityurl": identifier}
+    response = requests.get(RESOLVE_VANITY_URL, params=params, timeout=10)
+    response.raise_for_status()
+
+    data = response.json().get("response", {})
+    if data.get("success") != 1:
+        raise ValueError(
+            f"Could not find a Steam profile for '{identifier}'. "
+            "Check the username, or use your SteamID64 instead."
+        )
+    return data["steamid"]
+
 
 def fetch_owned_games(api_key: str, steam_id: str) -> list[dict]:
     #Return the user's owned games, or raise a helpful error

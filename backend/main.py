@@ -3,7 +3,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from fetch_backlog import fetch_owned_games, filter_backlog, STEAM_API_KEY
+from fetch_backlog import fetch_owned_games, filter_backlog, resolve_steam_id, STEAM_API_KEY
 from enrich import enrich_backlog
 from recommend import get_recommendation
 
@@ -25,9 +25,10 @@ def root():
 @app.get("/backlog/{steam_id}")
 def get_backlog(steam_id: str):
     try:
-        games = fetch_owned_games(STEAM_API_KEY, steam_id)
+        resolved_id = resolve_steam_id(STEAM_API_KEY, steam_id)
+        games = fetch_owned_games(STEAM_API_KEY, resolved_id)
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail="Could not fetch Steam data. Check the username/ID and try again.")
 
     backlog = filter_backlog(games)
     enriched = enrich_backlog(backlog)
@@ -42,9 +43,10 @@ class RecommendRequest(BaseModel):
 @app.post("/recommend")
 def recommend(req: RecommendRequest):
     try:
-        games = fetch_owned_games(STEAM_API_KEY, req.steam_id)
+        resolved_id = resolve_steam_id(STEAM_API_KEY, req.steam_id)
+        games = fetch_owned_games(STEAM_API_KEY, resolved_id)
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail="Could not fetch Steam data. Check the username/ID and try again.")
 
     backlog = filter_backlog(games)
     enriched = enrich_backlog(backlog)
