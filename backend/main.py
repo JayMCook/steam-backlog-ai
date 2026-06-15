@@ -18,7 +18,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "https://steam-backlog-recommender.vercel.app/"],
+    allow_origins=["http://localhost:5173", "https://steam-backlog-recommender.vercel.app"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
